@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useReducer } from "react";
 
 interface CartItem {
   id: number;
@@ -23,10 +23,8 @@ export const AppStateContext = createContext(defaultStateValue);
 
 // we create a different context for set state (for performance reasons)
 // https://stackoverflow.com/questions/66776717/does-putting-state-and-dispatch-into-separate-context-providers-prevent-unnecess
-export const AppSetStateContext =
-  createContext<
-    React.Dispatch<React.SetStateAction<AppStateValue>> | undefined
-  >(undefined);
+export const AppDispatchContext =
+  createContext<React.Dispatch<AddToCartAction> | undefined>(undefined);
 
 interface Action<T> {
   type: T;
@@ -34,15 +32,14 @@ interface Action<T> {
 
 interface AddToCartAction extends Action<"ADD_TO_CART"> {
   payload: {
-    item: CartItem;
+    item: Omit<CartItem, "quantity">;
   };
 }
 
 const reducer = (state: AppStateValue, action: AddToCartAction) => {
   if (action.type === "ADD_TO_CART") {
-    const itemExist = state.cart.items.find(
-      (item) => item.id === action.payload.item.id
-    );
+    const itemToAdd = action.payload.item;
+    const itemExist = state.cart.items.find((item) => item.id === itemToAdd.id);
 
     return {
       ...state,
@@ -56,14 +53,9 @@ const reducer = (state: AppStateValue, action: AddToCartAction) => {
                 return item;
               }
             })
-          : [
+          : /*[...state.cart.items, itemToAdd]*/ [
               ...state.cart.items,
-              {
-                id: action.payload.item.id,
-                name: action.payload.item.name,
-                price: action.payload.item.price,
-                quantity: 1,
-              },
+              { ...itemToAdd, quantity: 1 },
             ],
       },
     };
@@ -71,8 +63,8 @@ const reducer = (state: AppStateValue, action: AddToCartAction) => {
   return state;
 };
 
-export const useSetState = () => {
-  const setState = useContext(AppSetStateContext);
+export const useStateDispatch = () => {
+  const setState = useContext(AppDispatchContext);
   if (!setState) {
     throw new Error(
       "useSetState was called outside of the AppSetStateContext.Provider"
@@ -82,12 +74,12 @@ export const useSetState = () => {
 };
 
 const AppStateProvider: React.FC = ({ children }) => {
-  const [state, setState] = useState(defaultStateValue);
+  const [state, dispatch] = useReducer(reducer, defaultStateValue);
   return (
     <AppStateContext.Provider value={state}>
-      <AppSetStateContext.Provider value={setState}>
+      <AppDispatchContext.Provider value={dispatch}>
         {children}
-      </AppSetStateContext.Provider>
+      </AppDispatchContext.Provider>
     </AppStateContext.Provider>
   );
 };
