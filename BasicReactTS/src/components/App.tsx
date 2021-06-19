@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import pizzas from "../data/pizzas.json";
 import PizzaItem from "./PizzaItem";
 import Cart from "./Cart";
@@ -9,7 +9,6 @@ import SpecialOffer from "./SpecialOffer";
 
 const App = () => {
   const specialOffer = pizzas.find((pizza) => pizza.specialOffer === true);
-
   return (
     <AppStateProvider>
       <div className={AppCSS.container}>

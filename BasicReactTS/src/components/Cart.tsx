@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React from "react";
 import { FiShoppingCart } from "react-icons/fi";
 import CartCSS from "./Cart.module.css";
 import { AppStateContext } from "./AppState";
