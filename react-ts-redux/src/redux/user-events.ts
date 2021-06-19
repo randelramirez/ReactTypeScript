@@ -27,6 +27,12 @@ const CREATE_SUCCESS = "userEvents/create_success";
 
 const CREATE_FAILURE = "userEvents/create_failure";
 
+const DELETE_REQUEST = "userEvents/delete_request";
+
+const DELETE_SUCCESS = "userEvents/delete_success";
+
+const DELETE_FAILURE = "userEvents/delete_failure";
+
 interface LoadRequestAction extends Action<typeof LOAD_REQUEST> {}
 
 interface LoadSuccessAction extends Action<typeof LOAD_SUCCESS> {
@@ -47,10 +53,20 @@ interface CreateFailureAction extends Action<typeof CREATE_FAILURE> {
   error: string;
 }
 
+interface DeleteRequestAction extends Action<typeof DELETE_REQUEST> {}
+
+interface DeleteSuccessAction extends Action<typeof DELETE_SUCCESS> {
+  payload: { id: number };
+}
+
+interface DeleteFailureAction extends Action<typeof DELETE_FAILURE> {
+  error: string;
+}
+
 // The action types provided in the Generic Type argument represents what action can be dispatch inside of that action
 export const loadUserEvents =
   (): ThunkAction<
-    void,
+    Promise<void>,
     RootState,
     undefined,
     LoadRequestAction | LoadSuccessAction | LoadFailAction
@@ -78,6 +94,7 @@ export const createUserEvent =
     dispatch({ type: CREATE_REQUEST });
     try {
       const dateStart = selectDateStart(getState());
+      console.log("dateStart", dateStart);
       const event: Omit<UserEvent, "id"> = {
         title: "no name",
         dateStart,
@@ -99,6 +116,27 @@ export const createUserEvent =
     }
   };
 
+export const deleteUserEvent =
+  (
+    id: UserEvent["id"]
+  ): ThunkAction<
+    Promise<void>,
+    RootState,
+    undefined,
+    DeleteRequestAction | DeleteSuccessAction | DeleteFailureAction
+  > =>
+  async (dispatch, getState) => {
+    try {
+      dispatch({ type: DELETE_REQUEST });
+      const response = await fetch(`http://localhost:3001/events/${id}`);
+      if (response.ok) {
+        dispatch({ type: DELETE_SUCCESS, payload: { id } });
+      }
+    } catch (error) {
+      dispatch({ type: DELETE_FAILURE, error: "failed to delete event" });
+    }
+  };
+
 const selectUserEventsState = (rootState: RootState) => rootState.userEvents;
 
 export const selectUserEvents = (rootState: RootState) => {
@@ -113,13 +151,7 @@ const initialState: UserEventsState = {
 
 const userEventsReducer = (
   state: UserEventsState = initialState,
-  action:
-    | LoadRequestAction
-    | LoadSuccessAction
-    | LoadFailAction
-    | CreateRequestAction
-    | CreateSuccessAction
-    | CreateFailureAction
+  action: LoadSuccessAction | CreateSuccessAction | DeleteSuccessAction
 ): UserEventsState => {
   switch (action.type) {
     case LOAD_SUCCESS:
@@ -141,6 +173,15 @@ const userEventsReducer = (
         allIds: [...state.allIds, event.id],
         byIds: { ...state.byIds, [event.id]: event },
       };
+    case DELETE_SUCCESS:
+      const { id } = action.payload;
+      const newState = {
+        ...state,
+        allIds: state.allIds.filter((storedId) => storedId !== id),
+        byIds: { ...state.byIds },
+      };
+      delete newState.byIds[id];
+      return newState;
     default:
       return state;
   }

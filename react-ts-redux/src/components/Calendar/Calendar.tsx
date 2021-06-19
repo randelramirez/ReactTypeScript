@@ -8,6 +8,7 @@ import {
   UserEvent,
 } from "../../redux/user-events";
 import "./Calendar.css";
+import EventItem from "./EventItem";
 
 const mapState = (state: RootState) => ({ events: selectUserEvents(state) });
 
@@ -57,7 +58,6 @@ export const Calendar: React.FC<Props> = ({ events, loadUserEvents }) => {
   useEffect(() => {
     loadUserEvents();
   }, [loadUserEvents]);
-
   let groupedEvents: ReturnType<typeof groupEventsByDay> | undefined;
   let sortedGroupKeys: string[] | undefined;
 
@@ -88,15 +88,10 @@ export const Calendar: React.FC<Props> = ({ events, loadUserEvents }) => {
             <div className="calendar-events">
               {events.map((event) => {
                 return (
-                  <div key={event.id} className="calendar-event">
-                    <div className="calendar-event-info">
-                      <div className="calendar-event-time">10:00 - 12:00</div>
-                      <div className="calendar-event-title">{event.title}</div>
-                    </div>
-                    <button className="calendar-event-delete-button">
-                      &times;
-                    </button>
-                  </div>
+                  <EventItem
+                    key={`event_${event.id}`}
+                    event={event}
+                  ></EventItem>
                 );
               })}
             </div>
