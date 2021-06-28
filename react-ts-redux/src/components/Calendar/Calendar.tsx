@@ -18,6 +18,7 @@ const mapDispatch = {
 
 const connector = connect(mapState, mapDispatch);
 
+// PropsFromRedux infers the type connector, this way whatever is mapState & mapDispatch will be inferred
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 interface Props extends PropsFromRedux {}
@@ -67,6 +68,7 @@ export const Calendar: React.FC<Props> = ({ events, loadUserEvents }) => {
       (date1, date2) => +new Date(date2) - +new Date(date1)
     );
   }
+
   return groupedEvents && sortedGroupKeys ? (
     <div className="calendar">
       {sortedGroupKeys.map((dayKey) => {
