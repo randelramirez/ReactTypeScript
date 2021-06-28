@@ -11,12 +11,16 @@ const STOP = "recorder/stop";
 type StartAction = Action<typeof START>;
 type StopAction = Action<typeof STOP>;
 
+// Action Creator
 export const start = (): StartAction => ({ type: START });
 
+// Action Creator
 export const stop = (): StopAction => ({ type: STOP });
 
+// selector
 export const selectRecorderState = (rootState: RootState) => rootState.recorder;
 
+// selector
 export const selectDateStart = (rootState: RootState) =>
   selectRecorderState(rootState).dateStart;
 
