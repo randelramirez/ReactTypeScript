@@ -4,7 +4,7 @@ import PizzaItem from "./PizzaItem";
 import Cart from "./Cart";
 import AppCSS from "./App.module.css";
 import PizzaSVG from "../svg/pizza.svg";
-import AppStateProvider from "./AppState";
+import AppStateProvider from "../appStateContext";
 import SpecialOffer from "./SpecialOffer";
 
 const App = () => {
