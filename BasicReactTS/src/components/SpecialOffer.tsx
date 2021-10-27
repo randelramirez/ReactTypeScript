@@ -1,6 +1,6 @@
 import React from "react";
 import { Pizza } from "../types";
-import { withAddToCart, AddToCartProps } from "./AddToCart";
+import { withAddToCart, AddToCartProps } from "./withAddToCart";
 import SpecialOfferCSS from "./SpecialOffer.module.css";
 
 interface Props extends AddToCartProps {

@@ -23,6 +23,7 @@ export const AppStateContext = createContext(defaultStateValue);
 
 // we create a different context for set state (for performance reasons)
 // https://stackoverflow.com/questions/66776717/does-putting-state-and-dispatch-into-separate-context-providers-prevent-unnecess
+// we try to avoid value={{state, dispatch}}, value={state} is fine because that is being passed by reference but when we wrap state & dispatch inside a new object, the value is being passed as a new object (state is guaranteed by react to be stable)
 export const AppDispatchContext =
   createContext<
     React.Dispatch<InitializeCartAction | AddToCartAction> | undefined
@@ -93,6 +94,7 @@ export const useStateDispatch = () => {
   return setState;
 };
 
+// Refer to appStateContext.tsx and appDispatchContext
 const AppStateProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, defaultStateValue);
 

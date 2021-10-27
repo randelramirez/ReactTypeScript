@@ -1,7 +1,7 @@
 import React from "react";
 import PizzaCSS from "./Pizza.module.css";
 import { Pizza } from "../types";
-import { AddToCartProps, withAddToCart } from "./AddToCart";
+import withAddToCart, { AddToCartProps  } from "./withAddToCart";
 
 export interface Props extends AddToCartProps {
   pizza: Pizza;
